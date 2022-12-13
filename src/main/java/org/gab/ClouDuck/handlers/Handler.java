@@ -50,7 +50,11 @@ class HandlerTask implements Runnable {
         ) {
             
             var request = (Request)(in.readObject());
-            var aws = new AWSUtils(request.getAccessKey(), request.getSecretKey(), request.getBucketName());
+            AWSUtils aws;
+            if(request.getRegion() != null)
+                aws = new AWSUtils(request.getAccessKey(), request.getSecretKey(), request.getBucketName(), request.getRegion());
+            else
+                aws = new AWSUtils(request.getAccessKey(), request.getSecretKey(), request.getBucketName());
             
             Response response = switch (request.getOperation()) {
               
