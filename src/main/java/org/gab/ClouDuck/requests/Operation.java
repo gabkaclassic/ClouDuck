@@ -1,4 +1,4 @@
-package org.gab.ClouDuck.handlers;
+package org.gab.ClouDuck.requests;
 
 public enum Operation {
     GET, UPDATE, DELETE, SAVE

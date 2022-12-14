@@ -1,4 +1,4 @@
-package org.gab.ClouDuck.handlers;
+package org.gab.ClouDuck.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

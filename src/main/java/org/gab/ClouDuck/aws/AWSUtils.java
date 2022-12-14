@@ -7,28 +7,45 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.Bucket;
-import org.gab.ClouDuck.handlers.Response;
+import lombok.NoArgsConstructor;
+import org.gab.ClouDuck.exceptions.ExpiredKeyException;
+import org.gab.ClouDuck.exceptions.UserNotFoundException;
+import org.gab.ClouDuck.responses.RegistrationResponse;
+import org.gab.ClouDuck.responses.Response;
+import org.gab.ClouDuck.users.UserService;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
+@Service
+@NoArgsConstructor
 public class AWSUtils {
-    private final String accessKey;
-    private final String secretKey;
-    private final String bucketName;
+    private String accessKey;
+    private String secretKey;
+    private String bucketName;
     private AmazonS3 client;
     private Bucket bucket;
+    private UserService userService;
+    
+    public AWSUtils(String accessKey,
+                    String secretKey,
+                    String bucketName, UserService userService) {
+    
+        this(accessKey, secretKey, bucketName);
+        this.userService = userService;
+    }
     
     public AWSUtils(String accessKey,
                     String secretKey,
                     String bucketName) {
-    
+        
         this.accessKey = accessKey;
         this.secretKey = secretKey;
         this.bucketName = bucketName;
-    
+        
         AWSCredentials credentials = new BasicAWSCredentials(this.accessKey, this.secretKey);
         
         client = AmazonS3ClientBuilder
@@ -41,6 +58,15 @@ public class AWSUtils {
             client.createBucket(this.bucketName);
         
         this.bucket = client.listBuckets().stream().filter(b -> b.getName().equals(bucketName)).findAny().orElseThrow();
+    }
+    
+    public AWSUtils(String accessKey,
+                    String secretKey,
+                    String bucketName,
+                    String region, UserService userService) {
+        
+        this(accessKey, secretKey, bucketName, region);
+        this.userService = userService;
     }
     
     public AWSUtils(String accessKey,
@@ -66,7 +92,8 @@ public class AWSUtils {
         this.bucket = client.listBuckets().stream().filter(b -> b.getName().equals(bucketName)).findAny().orElseThrow();
     }
     
-    public Response save(String folder,
+    public Response save(String key,
+                         String folder,
                          String filename,
                          MultipartFile file) {
     
@@ -75,17 +102,20 @@ public class AWSUtils {
         try {
             file1 = new File(System.getProperty("java.io.tmpdir")+"/"+filename);
             file.transferTo(file1);
-        } catch (IOException e) {
+    
+            var result = client.putObject(bucketName, getFilename(key, folder, filename), file1);
+            file1.deleteOnExit();
+            
+            return Response.success(result.getContentMd5());
+        } catch (IOException | ExpiredKeyException | UserNotFoundException e) {
             return Response.error(e.getMessage());
         }
-        
-        var result = client.putObject(bucketName, getFilename(folder, filename), file1);
-        file1.deleteOnExit();
     
-        return Response.success(result.getContentMd5());
+    
     }
     
-    public Response save(String folder,
+    public Response save(String key,
+                         String folder,
                          String filename,
                          byte[] file) {
         
@@ -94,58 +124,69 @@ public class AWSUtils {
         try {
             file1 = new File(System.getProperty("java.io.tmpdir")+"/"+filename);
             Files.write(file1.toPath(), file);
-        } catch (IOException e) {
+            var result = client.putObject(bucketName, getFilename(key, folder, filename), file1);
+            
+            file1.deleteOnExit();
+            
+            return Response.success(result.getContentMd5());
+        } catch (IOException | ExpiredKeyException | UserNotFoundException e) {
             return Response.error(e.getMessage());
         }
+    
         
-        var result = client.putObject(bucketName, getFilename(folder, filename), file1);
-        file1.deleteOnExit();
-        
-        return Response.success(result.getContentMd5());
     }
     
-    public Response update(String folder,
+    public Response update(String key,
+                          String folder,
                           String filename,
                           MultipartFile file) {
     
-        delete(folder, filename);
+        delete(key, folder, filename);
     
-        return save(folder, filename, file);
+        return save(key, folder, filename, file);
     }
     
-    public Response update(String folder,
+    public Response update(String key,
+                           String folder,
                            String filename,
                            byte[] file) {
         
-        delete(folder, filename);
+        delete(key, folder, filename);
         
-        return save(folder, filename, file);
+        return save(key, folder, filename, file);
     }
-        public Response get(String folder,
-                            String filename) {
-        
-        
-        var result = client.getObject(bucketName,  getFilename(folder, filename));
+        public Response get(String key, String folder, String filename) {
     
-        byte[] file;
+            byte[] file;
+            try {
+            var result = client.getObject(bucketName,  getFilename(key, folder, filename));
+    
+                file = result.getObjectContent().readAllBytes();
+            } catch (IOException | ExpiredKeyException | UserNotFoundException e) {
+                return Response.error(e.getMessage());
+            }
+    
+            return Response.success(file);
+    }
+    
+    public Response delete(String key, String folder, String filename) {
+        
         try {
-            file = result.getObjectContent().readAllBytes();
-        } catch (IOException e) {
+            client.deleteObject(bucketName, getFilename(key, folder, filename));
+        }
+        catch (ExpiredKeyException | UserNotFoundException e) {
             return Response.error(e.getMessage());
         }
-    
-        return Response.success(file);
-    }
-    
-    public Response delete(String folder, String filename) {
-        
-        client.deleteObject(bucketName, getFilename(folder, filename));
-        
         return Response.success("Success");
     }
     
-    private String getFilename(String folder, String filename) {
+    private String getFilename(String key, String folder, String filename) throws ExpiredKeyException, UserNotFoundException {
         
-        return ((folder == null || folder.isEmpty()) ? "" : (folder + "/")) + filename;
+        return userService.rootFolderByKey(key) + (((folder == null || folder.isEmpty()) ? "" : (folder + "/")) + filename);
+    }
+    
+    public RegistrationResponse registration(String key) {
+    
+        return userService.registrationOrUpdateKey(key);
     }
 }

@@ -1,4 +1,4 @@
-package org.gab.ClouDuck.handlers;
+package org.gab.ClouDuck.requests;
 
 import lombok.Data;
 
@@ -7,11 +7,7 @@ public class Request {
     
     private String region;
     
-    private String secretKey;
-    
-    private String accessKey;
-    
-    private String bucketName;
+    private String key;
     
     private Operation operation;
     
