@@ -3,43 +3,23 @@ package org.gab.ClouDuck.responses;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-@Data
+import java.io.IOException;
+
 @AllArgsConstructor
+@Data
 public class Response {
+    static final String SUCCESS_STATUS = "Success";
+    static final String ERROR_STATUS = "Error";
 
-    public static final String SUCCESS_STATUS = "success";
-    public static final String ERROR_STATUS = "error";
-    private String status;
-    
-    private String message;
-    
-    private byte[] file;
+    static final String ERROR_MESSAGE = "Operation was finished with error:\n%s";
+    protected String status;
+    protected String message;
 
-    public Response(String status) {
-        this.status = status;
+    public static Response success() throws IOException {
+        return new Response(SUCCESS_STATUS, "Successful operation");
     }
-    
-    public Response(String status, String message) {
-        this.status = status;
-    }
-    
-    public Response(String status, byte[] file) {
-        this.status = status;
-        this.file = file;
-    }
-    
-    public static Response success(String message) {
-        
-        return new Response(SUCCESS_STATUS, message);
-    }
-    
-    public static Response success(byte[] file) {
-        
-        return new Response(SUCCESS_STATUS, file);
-    }
-    
-    public static Response error(String message) {
-        
-        return new Response(ERROR_STATUS, message);
+
+    public static Response error(Exception exception) {
+        return new Response(ERROR_STATUS, String.format(ERROR_MESSAGE, exception));
     }
 }

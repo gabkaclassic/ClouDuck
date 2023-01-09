@@ -10,9 +10,7 @@ public class Request {
     private String key;
     
     private Operation operation;
-    
-    private String folder;
-    
+
     private String filename;
     
     private byte[] file;

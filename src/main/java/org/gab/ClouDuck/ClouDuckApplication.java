@@ -1,13 +1,17 @@
 package org.gab.ClouDuck;
 
-import org.gab.ClouDuck.handlers.Handler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScans;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
+
+import javax.crypto.*;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 
 @SpringBootApplication
 @PropertySources({
@@ -19,7 +23,7 @@ import org.springframework.context.annotation.PropertySources;
 public class ClouDuckApplication {
 	
 	public static void main(String[] args) {
-		
+
 		SpringApplication.run(ClouDuckApplication.class, args);
 	}
 }

@@ -1,6 +1,6 @@
 package org.gab.ClouDuck.exceptions;
 
-import java.sql.Date;
+import java.util.Date;
 
 public class ExpiredKeyException extends Exception {
     

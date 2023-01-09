@@ -1,11 +1,11 @@
 package org.gab.ClouDuck.users;
 
+import com.amazonaws.regions.Regions;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.sql.Date;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "users")
@@ -13,20 +13,16 @@ import java.sql.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
-
     @Id
     @Column
-    private String key;
-    
-    @Column
-    private String rootFolder;
-    
-    @Basic
-    private Date expire;
-    
-    public User(String key, Date expire) {
-        
-        this.key = key;
-        this.expire = expire;
-    }
+    private String id;
+    @Column(name = "access_key")
+    @Lob
+    private byte[] accessKey;
+    @Column(name = "secret_key")
+    @Lob
+    private byte[] secretKey;
+    @Column(name = "region")
+    @Enumerated(EnumType.STRING)
+    private Regions region;
 }
