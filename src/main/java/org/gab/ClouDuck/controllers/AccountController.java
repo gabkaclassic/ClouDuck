@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("account")
 public class AccountController {
@@ -17,5 +19,11 @@ public class AccountController {
                                  @RequestParam(required = false) String region) {
 
         return AWSAccountUtils.registration(id, accessKey, secretKey, region);
+    }
+
+    @GetMapping("/logout")
+    public Response logout(@RequestParam String id) throws IOException {
+
+        return AWSAccountUtils.logout(id);
     }
 }

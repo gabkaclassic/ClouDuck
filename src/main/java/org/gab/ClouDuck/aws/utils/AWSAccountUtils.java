@@ -5,7 +5,11 @@ import org.gab.ClouDuck.responses.Response;
 import org.gab.ClouDuck.users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 @Component
 public class AWSAccountUtils {
@@ -59,7 +63,6 @@ public class AWSAccountUtils {
                 user.getRegion().getName()
         );
     }
-
     public static AWSBucketsUtils bucketLogin(String id) {
 
         var user = userService.findById(id);
@@ -78,5 +81,11 @@ public class AWSAccountUtils {
         } catch (Exception e) {
             return Response.error(e);
         }
+    }
+
+    @CacheEvict(value = {"login"})
+    public static Response logout(String id) throws IOException {
+
+        return Response.success();
     }
 }

@@ -25,7 +25,7 @@ public class BucketResponse extends Response {
         setBuckets(buckets);
     }
 
-    private BucketResponse(String status, String message, Bucket buckets) {
+    private BucketResponse(String status, String message, Bucket bucket) {
         super(status, message);
         setBucket(bucket);
     }
@@ -67,8 +67,8 @@ public class BucketResponse extends Response {
         return bucket;
     }
 
-    public void setBucket(BucketDTO bucket) {
-        this.bucket = bucket;
+    public void setBucket(Bucket bucket) {
+        this.bucket = new BucketDTO(bucket);
     }
 
     public boolean isExists() {
