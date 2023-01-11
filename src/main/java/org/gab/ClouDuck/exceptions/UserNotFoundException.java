@@ -1,10 +1,12 @@
 package org.gab.ClouDuck.exceptions;
 
 public class UserNotFoundException extends Exception {
-    public UserNotFoundException(String key) {
-        super(String.format("User with key ( %s ) is not found", key));
+
+    public UserNotFoundException(Exception e) {
+        super("User with this key is not found");
+        setStackTrace(e.getStackTrace());
     }
-    
+
     public String getMessage() {
         
         return "User with this key is not found";

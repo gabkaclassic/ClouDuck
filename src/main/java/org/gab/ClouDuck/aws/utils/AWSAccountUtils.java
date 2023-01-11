@@ -1,15 +1,16 @@
 package org.gab.ClouDuck.aws.utils;
 
 import org.gab.ClouDuck.crypt.Cryptographer;
+import org.gab.ClouDuck.exceptions.UserNotFoundException;
 import org.gab.ClouDuck.responses.Response;
 import org.gab.ClouDuck.users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 @Component
 public class AWSAccountUtils {
@@ -35,25 +36,18 @@ public class AWSAccountUtils {
         AWSAccountUtils.defaultRegion = defaultRegion;
     }
 
-    public static Response registration(String id, String accessKey, String secretKey, String region) {
+    public static Response registration(String id, String accessKey, String secretKey, String region) throws IOException {
 
         region = (region == null) ? defaultRegion : region;
-
-        try {
-            userService.createUser(
-                    id,
-                    cryptographer.encrypt(accessKey.getBytes()),
-                    cryptographer.encrypt(secretKey.getBytes()),
-                    region
-            );
-            return Response.success();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return Response.error(e);
-        }
+        userService.createUser(
+                id,
+                cryptographer.encrypt(accessKey.getBytes()),
+                cryptographer.encrypt(secretKey.getBytes()),
+                region
+        );
+        return Response.success();
     }
-    public static AWSObjectsUtils objectLogin(String id) {
+    public static AWSObjectsUtils objectLogin(String id) throws NoSuchElementException {
 
         var user = userService.findById(id);
 
@@ -63,7 +57,7 @@ public class AWSAccountUtils {
                 user.getRegion().getName()
         );
     }
-    public static AWSBucketsUtils bucketLogin(String id) {
+    public static AWSBucketsUtils bucketLogin(String id) throws NoSuchElementException {
 
         var user = userService.findById(id);
 
@@ -73,14 +67,10 @@ public class AWSAccountUtils {
                 user.getRegion().getName()
         );
     }
-    public static Response deleteAccount(String id) {
+    public static Response deleteAccount(String id) throws IOException {
 
-        try {
-            userService.delete(id);
-            return Response.success();
-        } catch (Exception e) {
-            return Response.error(e);
-        }
+        userService.delete(id);
+        return Response.success();
     }
 
     @CacheEvict(value = {"login"})

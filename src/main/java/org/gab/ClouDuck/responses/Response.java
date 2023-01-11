@@ -22,4 +22,8 @@ public class Response {
     public static Response error(Exception exception) {
         return new Response(ERROR_STATUS, String.format(ERROR_MESSAGE, exception));
     }
+
+    public void concatToMessage(String added) {
+        message = added + "\n" + message;
+    }
 }

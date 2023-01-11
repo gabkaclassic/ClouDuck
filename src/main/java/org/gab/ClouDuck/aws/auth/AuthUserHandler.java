@@ -5,14 +5,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.gab.ClouDuck.aws.utils.AWSAccountUtils;
 import org.gab.ClouDuck.aws.utils.AWSBucketsUtils;
 import org.gab.ClouDuck.aws.utils.AWSObjectsUtils;
-import org.gab.ClouDuck.controllers.BucketOperationController;
-import org.gab.ClouDuck.controllers.ObjectOperationsController;
+import org.gab.ClouDuck.controllers.aws.BucketOperationController;
+import org.gab.ClouDuck.controllers.aws.ObjectOperationsController;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebArgumentResolver;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+
+import java.util.NoSuchElementException;
 
 public class AuthUserHandler implements HandlerMethodArgumentResolver {
     @Override
@@ -22,13 +24,13 @@ public class AuthUserHandler implements HandlerMethodArgumentResolver {
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest nativeRequest, WebDataBinderFactory binderFactory) {
+    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest nativeRequest, WebDataBinderFactory binderFactory) throws NoSuchElementException {
 
         if(!this.supportsParameter(parameter))
             return WebArgumentResolver.UNRESOLVED;
 
         var request = nativeRequest.getNativeRequest(HttpServletRequest.class);
-        var id = request.getHeader("id");
+        var id = request.getParameter("id");
 
         if(id == null)
             throw new InvalidArgumentException("Parameter 'id' has been required");
@@ -40,6 +42,6 @@ public class AuthUserHandler implements HandlerMethodArgumentResolver {
         else if (cl.equals(BucketOperationController.class))
             return AWSAccountUtils.bucketLogin(id);
         else
-            throw new ClassCastException("This class can't will used with bean of aws-client class");
+            throw new ClassFormatError("This class can't will used with bean of aws-client class");
     }
 }

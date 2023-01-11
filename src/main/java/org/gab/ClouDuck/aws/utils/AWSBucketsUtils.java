@@ -10,45 +10,22 @@ public class AWSBucketsUtils extends AWSResourcesUtils {
 
     public BucketResponse create(String bucketName) {
 
-        try {
-            client.createBucket(bucketName);
-            return BucketResponse.success();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return BucketResponse.error(e);
-        }
+        client.createBucket(bucketName);
+        return BucketResponse.success();
     }
     public BucketResponse list() {
 
-        try {
-            return BucketResponse.success(client.listBuckets());
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return BucketResponse.error(e);
-        }
+        return BucketResponse.success(client.listBuckets());
     }
 
     public BucketResponse delete(String bucketName) {
 
-        try {
-            client.deleteBucket(bucketName);
-            return BucketResponse.success();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return BucketResponse.error(e);
-        }
+        client.deleteBucket(bucketName);
+        return BucketResponse.success();
     }
 
     public BucketResponse exists(String bucketName) {
 
-        try {
-            return BucketResponse.success(client.doesBucketExistV2(bucketName));
-        }
-        catch (Exception e) {
-            return BucketResponse.error(e);
-        }
+        return BucketResponse.success(client.doesBucketExistV2(bucketName));
     }
 }

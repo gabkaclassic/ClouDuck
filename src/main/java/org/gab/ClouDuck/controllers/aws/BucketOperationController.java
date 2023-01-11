@@ -1,4 +1,4 @@
-package org.gab.ClouDuck.controllers;
+package org.gab.ClouDuck.controllers.aws;
 
 import org.gab.ClouDuck.aws.utils.AWSBucketsUtils;
 import org.gab.ClouDuck.aws.auth.AWSSetup;
@@ -7,12 +7,14 @@ import org.gab.ClouDuck.responses.Response;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.NoSuchElementException;
+
 @RestController
 @RequestMapping("buckets")
 public class BucketOperationController {
 
     @PutMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Response create(@AWSSetup AWSBucketsUtils aws,
+    public BucketResponse create(@AWSSetup AWSBucketsUtils aws,
                                  @RequestParam String bucketName) {
 
         return aws.create(bucketName);

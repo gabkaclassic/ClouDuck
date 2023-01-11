@@ -2,6 +2,7 @@ package org.gab.ClouDuck.configurations;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import org.gab.ClouDuck.exceptions.UserNotFoundException;
 import org.gab.ClouDuck.users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
@@ -40,7 +41,7 @@ public class CacheConfiguration {
                                 .expireAfterWrite(12, TimeUnit.HOURS)
                                 .build(new CacheLoader() {
                                     @Override
-                                    public Object load(Object key) {
+                                    public Object load(Object key) throws UserNotFoundException {
 
                                         if(key == null)
                                             throw new IllegalArgumentException("Account ID can't be null");

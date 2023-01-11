@@ -4,12 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.SecretKey;
+import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 @Component
 public class Cryptographer {
@@ -22,7 +20,7 @@ public class Cryptographer {
             @Value("${encryption.algorithm.key}") String algorithmKey,
             @Value("${encryption.algorithm.cipher}") String algorithmCipher,
             @Value("${encryption.key}") String key
-    ) throws Exception {
+    ) throws NoSuchPaddingException, NoSuchAlgorithmException {
 
         Cryptographer.key = new SecretKeySpec(key.getBytes(), algorithmKey);
         Cryptographer.cipher = Cipher.getInstance(algorithmCipher);
