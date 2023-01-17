@@ -2,6 +2,7 @@ package org.gab.ClouDuck.controllers.exceptions.handlers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.gab.ClouDuck.controllers.exceptions.annotations.BasicResponseExceptionHandler;
+import org.gab.ClouDuck.exceptions.InvalidSecretKeyException;
 import org.gab.ClouDuck.exceptions.UserNotFoundException;
 import org.gab.ClouDuck.responses.Response;
 import org.springframework.http.HttpStatus;
@@ -14,7 +15,7 @@ import java.util.NoSuchElementException;
 
 @ControllerAdvice(annotations = BasicResponseExceptionHandler.class)
 @Slf4j
-public class AWSAccountAdvice {
+public class OtherControllerAdvice {
 
     @ExceptionHandler(value = {NoSuchElementException.class, NullPointerException.class})
     public ResponseEntity<Response> nullHandler(NoSuchElementException e) {
@@ -43,5 +44,16 @@ public class AWSAccountAdvice {
         var response = Response.error(e);
 
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
+    @ExceptionHandler(value = {InvalidSecretKeyException.class})
+    public ResponseEntity<Response> secretKeyHandler(InvalidSecretKeyException e) {
+
+        log.error("Secret key is invalid", e);
+
+        var response = Response.error(e);
+
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 }

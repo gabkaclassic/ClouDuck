@@ -1,7 +1,6 @@
 package org.gab.ClouDuck.aws.utils;
 
 import org.gab.ClouDuck.crypt.Cryptographer;
-import org.gab.ClouDuck.exceptions.UserNotFoundException;
 import org.gab.ClouDuck.responses.Response;
 import org.gab.ClouDuck.users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,17 +35,6 @@ public class AWSAccountUtils {
         AWSAccountUtils.defaultRegion = defaultRegion;
     }
 
-    public static Response registration(String id, String accessKey, String secretKey, String region) throws IOException {
-
-        region = (region == null) ? defaultRegion : region;
-        userService.createUser(
-                id,
-                cryptographer.encrypt(accessKey.getBytes()),
-                cryptographer.encrypt(secretKey.getBytes()),
-                region
-        );
-        return Response.success();
-    }
     public static AWSObjectsUtils objectLogin(String id) throws NoSuchElementException {
 
         var user = userService.findById(id);
@@ -56,6 +44,17 @@ public class AWSAccountUtils {
                 cryptographer.decrypt(user.getSecretKey()),
                 user.getRegion().getName()
         );
+    }
+    public static Response registration(String id, String secretKey, String awsAccessKey, String region) throws IOException {
+
+        region = (region == null) ? defaultRegion : region;
+        userService.createUser(
+                id,
+                cryptographer.encrypt(awsAccessKey.getBytes()),
+                cryptographer.encrypt(secretKey.getBytes()),
+                region
+        );
+        return Response.success();
     }
     public static AWSBucketsUtils bucketLogin(String id) throws NoSuchElementException {
 

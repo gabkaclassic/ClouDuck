@@ -1,6 +1,7 @@
 package org.gab.ClouDuck.configurations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.gab.ClouDuck.controllers.SecurityData;
 import org.gab.ClouDuck.crypt.Cryptographer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,14 +17,9 @@ public class UtilsConfiguration {
         return new ObjectMapper();
     }
 
-//    @Bean
-//    @Scope(scopeName = "singleton")
-//    @Autowired
-//    public Cryptographer cryptographer(
-//            @Value("${encryption.algorithm.key}") String algorithmKey,
-//            @Value("${encryption.algorithm.cipher}") String algorithmCipher,
-//            @Value("${encryption.key}") String key) throws Exception {
-//        return new Cryptographer(algorithmKey, algorithmCipher, key);
-//    }
-
+    @Bean
+    @Scope(scopeName = "singleton")
+    public SecurityData data(@Autowired Cryptographer cryptographer, @Value("${secret_key}") String secret) {
+        return new SecurityData(cryptographer, secret);
+    }
 }

@@ -7,8 +7,6 @@ import org.gab.ClouDuck.responses.Response;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.NoSuchElementException;
-
 @RestController
 @RequestMapping("buckets")
 public class BucketOperationController {

@@ -7,12 +7,6 @@ import org.springframework.context.annotation.ComponentScans;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 
-import javax.crypto.*;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.UUID;
-
 @SpringBootApplication
 @PropertySources({
 		@PropertySource("classpath:application.properties")
